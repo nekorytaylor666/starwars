@@ -17,7 +17,6 @@ namespace Ado_net
 {
     public class Person : IGetFromAPI<Person>, ISaveToDB<Person>
     {
-        private string url = $"https://swapi.co/api/people/?page=1&format=json";
         public string Name { get; set; }
         public string Height { get; set; }
         public string Mass { get; set; }
@@ -77,37 +76,38 @@ namespace Ado_net
                 connection.Open();
                 do
                 {
-                    List<Person> people = getFrom.GetListObjects(url, out urlNext);
+                    List<Person> people = getFrom.GetListObjects(Url, out urlNext);
                     List<DbCommand> commands = new List<DbCommand>();
                     foreach (var person in people)
                     {
 
-                        var command = new SqlCommand();
-                        command.Connection = connection;
-                        command.CommandText = $"insert into people values (@name,@height,@mass,@hairColor,@skinColor,@eyeColor,@gender,@homeWorld,@url)";
+                        var command = new SqlCommand
+                        {
+                            Connection = connection,
+                            CommandText = $"insert into people values (@name,@height,@mass,@hairColor,@skinColor,@eyeColor,@gender,@homeWorld,@url)"
+                        };
 
                         command.Parameters.AddRange(new SqlParameter[]
                         {
-                    new SqlParameter("@name",person.Name),
-                    new SqlParameter("@height",person.Height),
-                    new SqlParameter("@mass",person.Mass),
-                    new SqlParameter("@hairColor",person.HairColor),
-                    new SqlParameter("@skinColor",person.SkinColor),
-                    new SqlParameter("@eyeColor",person.EyeColor),
-                    new SqlParameter("@gender",person.Gender),
-                    new SqlParameter("@homeworld",person.Homeworld),
-                    new SqlParameter("@url",person.Url),
-
+                            new SqlParameter("@name",person.Name),
+                            new SqlParameter("@height",person.Height),
+                            new SqlParameter("@mass",person.Mass),
+                            new SqlParameter("@hairColor",person.HairColor),
+                            new SqlParameter("@skinColor",person.SkinColor),
+                            new SqlParameter("@eyeColor",person.EyeColor),
+                            new SqlParameter("@gender",person.Gender),
+                            new SqlParameter("@homeworld",person.Homeworld),
+                            new SqlParameter("@url",person.Url),
                         });
                         commands.Add(command);
                         Console.WriteLine("Creating the command...");
                     }
                     ExecuteInTransaction(connection, commands);
-                    url = urlNext;
+                    Url = urlNext;
                 } while (urlNext!= string.Empty);
                 
             }
-        }
+        }   
 
         public bool ExecuteInTransaction(DbConnection connection, List<DbCommand> commands)
         {

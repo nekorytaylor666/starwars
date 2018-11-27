@@ -17,9 +17,19 @@ namespace Ado_net
     {
         static void Main(string[] args)
         {
+            
             IGetFromAPI<Person> people = new Person();
-            ISaveToDB<Person> DbSaver = new Person();
-            DbSaver.SaveList(people);
+            ISaveToDB<Person> DbSaverPeople = new Person
+            {
+                Url = $"https://swapi.co/api/people/?page=1&format=json"
+            };
+            IGetFromAPI<Planet> planets = new Planet();
+            ISaveToDB<Planet> DbSaverPlanets = new Planet()
+            {
+                Url = $"https://swapi.co/api/planets/?page=1&format=json"
+            };
+            //DbSaverPeople.SaveList(people);
+            DbSaverPlanets.SaveList(planets);
         }
 
 

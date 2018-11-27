@@ -12,6 +12,7 @@ namespace Ado_net
 {
     public interface ISaveToDB<T>
     {
+        string Url { get; set; }
         void SaveList(IGetFromAPI<T> getFrom);
         bool ExecuteInTransaction(DbConnection connection, List<DbCommand> commands);
         void TransactionFail(Exception exception, DbTransaction transaction);
