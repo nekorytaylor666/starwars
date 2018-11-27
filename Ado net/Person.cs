@@ -29,7 +29,9 @@ namespace Ado_net
         [JsonProperty(PropertyName = "birth_year")]
         public string BirthYear { get; set; }
         public string Gender { get; set; }
-        public string Homeworld { get; set; }
+        [JsonProperty(PropertyName = "Homeworld")]
+        public string HomeworldUrl { get; set; }
+        public int HomeworldId { get; set; }
         public List<string> Films { get; set; }
         public List<string> Species { get; set; }
         public List<object> Vehicles { get; set; }
@@ -60,8 +62,14 @@ namespace Ado_net
             {
                 JObject json = JObject.Parse(client.DownloadString(url));
                 people.AddRange(JsonConvert.DeserializeObject<List<Person>>(json.GetValue("results").ToString()));
+                foreach (var person in people)
+                {
+                    char[] homeworldUrlCharArr = person.HomeworldUrl.ToCharArray();
+                    person.HomeworldId = Convert.ToInt32(homeworldUrlCharArr[person.HomeworldUrl.Length-2].ToString());
+                    
+                }
                 urlNext = json.GetValue("next").ToString();
-                Console.WriteLine("Download people...");
+                Console.WriteLine("Download people...");    
                 Console.WriteLine("Complete...");
             }
             return people;
@@ -96,7 +104,7 @@ namespace Ado_net
                             new SqlParameter("@skinColor",person.SkinColor),
                             new SqlParameter("@eyeColor",person.EyeColor),
                             new SqlParameter("@gender",person.Gender),
-                            new SqlParameter("@homeworld",person.Homeworld),
+                            new SqlParameter("@homeworld",person.HomeworldId),
                             new SqlParameter("@url",person.Url),
                         });
                         commands.Add(command);
@@ -120,7 +128,7 @@ namespace Ado_net
                         command.Transaction = transaction;
                         command.ExecuteNonQuery();
                     }
-                    transaction.Commit();
+                        transaction.Commit();
                     return true;
                 }
                 catch (SqlException exception)
